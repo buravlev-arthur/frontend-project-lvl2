@@ -16,15 +16,16 @@ const getDataOfFile = (filepath) => {
 
 const valuesAreSame = (value1, value2) => value1 === value2;
 
-const getDifference = (object1, object2) => {
+const getDifferenceOfObjects = (object1, object2) => {
   const entriesOfObject1 = Object.entries(object1);
 
   const result = entriesOfObject1.reduce((acc, [key, value]) => {
     const newAcc = [...acc];
     const secondObjectHasKey = _.has(object2, key);
     const secondObjectValue = object2[key] ?? null;
+    const valsAreSame = valuesAreSame(value, secondObjectValue);
 
-    if (secondObjectHasKey && valuesAreSame(value, secondObjectValue)) {
+    if (secondObjectHasKey && valsAreSame) {
       newAcc.push({ sign: ' ', key, value });
       return newAcc;
     }
@@ -62,7 +63,7 @@ export default (filepath1, filepath2) => {
   const object2 = getDataOfFile(filepath2);
 
   const diffsOfProps = [
-    ...getDifference(object1, object2),
+    ...getDifferenceOfObjects(object1, object2),
     ...getRestOfObject(object1, object2),
   ];
   const sortedDiffsOfProps = _.sortBy(diffsOfProps, (prop) => prop.key);
