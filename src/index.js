@@ -8,7 +8,7 @@ const getDataOfFile = (filepath) => {
   const fileIsJSON = normalizedPath.includes('.json');
 
   if (fileExists && fileIsJSON) {
-    return JSON.parse(fs.readFileSync(normalizedPath));
+    return JSON.parse(fs.readFileSync(normalizedPath, 'utf-8'));
   }
 
   throw new Error(`File "${filepath}" doesn't exists or has incorrect extension`);
@@ -16,7 +16,7 @@ const getDataOfFile = (filepath) => {
 
 const valuesAreSame = (value1, value2) => value1 === value2;
 
-const getDifferenceOfObjects = (object1, object2) => {
+const getDifference = (object1, object2) => {
   const entriesOfObject1 = Object.entries(object1);
 
   const result = entriesOfObject1.reduce((acc, [key, value]) => {
@@ -62,7 +62,7 @@ export default (filepath1, filepath2) => {
   const object2 = getDataOfFile(filepath2);
 
   const diffsOfProps = [
-    ...getDifferenceOfObjects(object1, object2),
+    ...getDifference(object1, object2),
     ...getRestOfObject(object1, object2),
   ];
   const sortedDiffsOfProps = _.sortBy(diffsOfProps, (prop) => prop.key);
