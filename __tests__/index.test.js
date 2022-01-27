@@ -31,4 +31,5 @@ test('genDiff', () => {
   expect(genDiff(file1, file1)).toBe(expectedFile2);
   expect(genDiff(file3, file3)).toBe('{\n}');
   expect(genDiff(file2, file3)).toBe(expectedFile3);
+  expect(genDiff(file1, expectedFile1)).toBeNull();
 });

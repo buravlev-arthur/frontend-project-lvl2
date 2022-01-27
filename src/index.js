@@ -11,7 +11,7 @@ const getDataOfFile = (filepath) => {
     return JSON.parse(fs.readFileSync(normalizedPath, 'utf-8'));
   }
 
-  throw new Error(`File "${filepath}" doesn't exists or has incorrect extension`);
+  return false;
 };
 
 const areEqual = (value1, value2) => value1 === value2;
@@ -47,6 +47,10 @@ const getDifferences = (object1, object2) => [
 export default (filepath1, filepath2) => {
   const object1 = getDataOfFile(filepath1);
   const object2 = getDataOfFile(filepath2);
+
+  if (!object1 || !object2) {
+    return null;
+  }
 
   const differences = getDifferences(object1, object2);
   const sortedDifferences = _.sortBy(differences, (prop) => prop.key);
