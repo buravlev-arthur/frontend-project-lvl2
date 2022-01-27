@@ -1,14 +1,14 @@
 import * as fs from 'fs';
 import _ from 'lodash';
 import path from 'path';
+import parse from './parsers.js';
 
 const getDataOfFile = (filepath) => {
   const normalizedPath = path.resolve(filepath);
   const fileExists = fs.existsSync(normalizedPath);
-  const fileIsJSON = normalizedPath.includes('.json');
 
-  if (fileExists && fileIsJSON) {
-    return JSON.parse(fs.readFileSync(normalizedPath, 'utf-8'));
+  if (fileExists) {
+    return parse(fs.readFileSync(normalizedPath, 'utf-8'), normalizedPath);
   }
 
   return false;

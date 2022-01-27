@@ -18,13 +18,13 @@ jobs:
       - name: Installing dependencies
         run: make install
 
-      - name: linting
+      - name: Linting code
         run: make lint
 
-      - name: testing
+      - name: Testing code
         run: make test
       
-      - name: reporting test-coverage to codeclimate 
+      - name: Reporting test-coverage to Codeclimate
         uses: paambaati/codeclimate-action@v2.7.4
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_ID }}
