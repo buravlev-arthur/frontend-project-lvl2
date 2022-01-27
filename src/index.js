@@ -14,60 +14,47 @@ const getDataOfFile = (filepath) => {
   throw new Error(`File "${filepath}" doesn't exists or has incorrect extension`);
 };
 
-const valuesAreSame = (value1, value2) => value1 === value2;
+const areSame = (value1, value2) => value1 === value2;
 
-const getDifferenceOfObjects = (object1, object2) => {
-  const entriesOfObject1 = Object.entries(object1);
+const sameValues = (object, key, value) => _.has(object, key) && areSame(value, object[key]);
 
-  const result = entriesOfObject1.reduce((acc, [key, value]) => {
-    const newAcc = [...acc];
-    const secondObjectHasKey = _.has(object2, key);
-    const secondObjectValue = object2[key] ?? null;
-    const valsAreSame = valuesAreSame(value, secondObjectValue);
+const differentValues = (object, key, value) => _.has(object, key) && !areSame(value, object[key]);
 
-    if (secondObjectHasKey && valsAreSame) {
-      newAcc.push({ sign: ' ', key, value });
-      return newAcc;
-    }
+const getObject = (sign, key, value) => ({ sign, key, value });
 
-    newAcc.push({ sign: '-', key, value });
+const getKeysWithSameValues = (object1, object2) => Object.entries(object1)
+  .filter(([key, value]) => sameValues(object2, key, value))
+  .map(([key, value]) => getObject(' ', key, value));
 
-    if (secondObjectHasKey) {
-      newAcc.push({ sign: '+', key, value: secondObjectValue });
-    }
+const getKeysWithDifferentValues = (object1, object2) => Object.entries(object1)
+  .filter(([key, value]) => differentValues(object2, key, value))
+  .map(([key, value]) => [
+    getObject('-', key, value),
+    getObject('+', key, object2[key]),
+  ]);
 
-    return newAcc;
-  }, []);
+const getRestOfFirstObject = (object1, object2) => Object.entries(object1)
+  .filter(([key]) => !_.has(object2, key))
+  .map(([key, value]) => getObject('-', key, value));
 
-  return result;
-};
+const getRestOfSecondObject = (object1, object2) => Object.entries(object2)
+  .filter(([key]) => !_.has(object1, key))
+  .map(([key, value]) => getObject('+', key, value));
 
-const getRestOfObject = (object1, object2) => {
-  const entriesOfObject2 = Object.entries(object2);
-
-  const result = entriesOfObject2.reduce((acc, [key, value]) => {
-    const newAcc = [...acc];
-
-    if (!_.has(object1, key)) {
-      newAcc.push({ sign: '+', key, value });
-    }
-
-    return newAcc;
-  }, []);
-
-  return result;
-};
+const getDifferences = (object1, object2) => [
+  ...getKeysWithSameValues(object1, object2),
+  ...getKeysWithDifferentValues(object1, object2),
+  ...getRestOfFirstObject(object1, object2),
+  ...getRestOfSecondObject(object1, object2),
+].flat();
 
 export default (filepath1, filepath2) => {
   const object1 = getDataOfFile(filepath1);
   const object2 = getDataOfFile(filepath2);
 
-  const diffsOfProps = [
-    ...getDifferenceOfObjects(object1, object2),
-    ...getRestOfObject(object1, object2),
-  ];
-  const sortedDiffsOfProps = _.sortBy(diffsOfProps, (prop) => prop.key);
-  const diffsOfPropsStrs = sortedDiffsOfProps.map(({ sign, key, value }) => ` ${sign} ${key}: ${value}`);
+  const differences = getDifferences(object1, object2);
+  const sortedDifferences = _.sortBy(differences, (prop) => prop.key);
+  const differencesAsStrings = sortedDifferences.map(({ sign, key, value }) => ` ${sign} ${key}: ${value}`);
 
-  return ['{', ...diffsOfPropsStrs, '}'].join('\n');
+  return ['{', ...differencesAsStrings, '}'].join('\n');
 };

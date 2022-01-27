@@ -24,7 +24,7 @@ jobs:
       - name: testing
         run: make test
       
-      - name: publishing code coverage to code-climate 
+      - name: reporting test-coverage to codeclimate 
         uses: paambaati/codeclimate-action@v2.7.4
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_ID }}
