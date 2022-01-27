@@ -14,38 +14,34 @@ const getDataOfFile = (filepath) => {
   throw new Error(`File "${filepath}" doesn't exists or has incorrect extension`);
 };
 
-const areSame = (value1, value2) => value1 === value2;
+const areEqual = (value1, value2) => value1 === value2;
 
-const sameValues = (object, key, value) => _.has(object, key) && areSame(value, object[key]);
+const areSame = (object, key, value) => _.has(object, key) && areEqual(value, object[key]);
 
-const differentValues = (object, key, value) => _.has(object, key) && !areSame(value, object[key]);
+const areDifferent = (object, key, value) => _.has(object, key) && !areEqual(value, object[key]);
 
 const getObject = (sign, key, value) => ({ sign, key, value });
 
 const getKeysWithSameValues = (object1, object2) => Object.entries(object1)
-  .filter(([key, value]) => sameValues(object2, key, value))
+  .filter(([key, value]) => areSame(object2, key, value))
   .map(([key, value]) => getObject(' ', key, value));
 
 const getKeysWithDifferentValues = (object1, object2) => Object.entries(object1)
-  .filter(([key, value]) => differentValues(object2, key, value))
+  .filter(([key, value]) => areDifferent(object2, key, value))
   .map(([key, value]) => [
     getObject('-', key, value),
     getObject('+', key, object2[key]),
   ]);
 
-const getRestOfFirstObject = (object1, object2) => Object.entries(object1)
+const getRestOfObject = (object1, object2, sign) => Object.entries(object1)
   .filter(([key]) => !_.has(object2, key))
-  .map(([key, value]) => getObject('-', key, value));
-
-const getRestOfSecondObject = (object1, object2) => Object.entries(object2)
-  .filter(([key]) => !_.has(object1, key))
-  .map(([key, value]) => getObject('+', key, value));
+  .map(([key, value]) => getObject(sign, key, value));
 
 const getDifferences = (object1, object2) => [
   ...getKeysWithSameValues(object1, object2),
   ...getKeysWithDifferentValues(object1, object2),
-  ...getRestOfFirstObject(object1, object2),
-  ...getRestOfSecondObject(object1, object2),
+  ...getRestOfObject(object1, object2, '-'),
+  ...getRestOfObject(object2, object1, '+'),
 ].flat();
 
 export default (filepath1, filepath2) => {
