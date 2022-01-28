@@ -8,3 +8,6 @@
 
 #### Сравнение плоских YAML-файлов
 [![asciicast](https://asciinema.org/a/yGxOqFate52Ur8dzdqFTSlS9j.svg)](https://asciinema.org/a/yGxOqFate52Ur8dzdqFTSlS9j)
+
+#### Глубокое сравнение файлов
+[![asciicast](https://asciinema.org/a/Uyu0AhyTESYr0w3uz2lB9VFQb.svg)](https://asciinema.org/a/Uyu0AhyTESYr0w3uz2lB9VFQb)

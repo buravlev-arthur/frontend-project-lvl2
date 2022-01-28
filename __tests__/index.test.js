@@ -39,7 +39,6 @@ test('Testing of JSON-files', () => {
   expect(genDiff(jsonFile1, jsonFile1)).toBe(expectedFile2);
   expect(genDiff(emptyJsonFile, emptyJsonFile)).toBe('{\n}');
   expect(genDiff(jsonFile2, emptyJsonFile)).toBe(expectedFile3);
-  expect(genDiff(jsonFile1, expectedFile1)).toBeNull();
 });
 
 test('Testing of YAML-files', () => {
@@ -47,5 +46,4 @@ test('Testing of YAML-files', () => {
   expect(genDiff(yamlFile1, yamlFile1)).toBe(expectedFile2);
   expect(genDiff(emptyYamlFile, emptyYamlFile)).toBe('{\n}');
   expect(genDiff(yamlFile2, emptyYamlFile)).toBe(expectedFile3);
-  expect(genDiff(yamlFile1, expectedFile1)).toBeNull();
 });

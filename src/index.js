@@ -1,60 +1,58 @@
 import * as fs from 'fs';
 import _ from 'lodash';
 import path from 'path';
+import { areEqual, isObject } from './utils.js';
 import parse from './parsers.js';
+import toStylish from './stylish.js';
 
 const getDataOfFile = (filepath) => {
   const normalizedPath = path.resolve(filepath);
-  const fileExists = fs.existsSync(normalizedPath);
-
-  if (fileExists) {
-    return parse(fs.readFileSync(normalizedPath, 'utf-8'), normalizedPath);
-  }
-
-  return false;
+  return parse(fs.readFileSync(normalizedPath, 'utf-8'), normalizedPath);
 };
 
-const areEqual = (value1, value2) => value1 === value2;
+const getObject = (status, key, value) => ({ status, key, value });
 
-const areSame = (object, key, value) => _.has(object, key) && areEqual(value, object[key]);
+const getDifferences = (object1, object2) => {
+  const diff = Object.entries(object1).reduce((acc, [key, value]) => {
+    if (!_.has(object2, key)) {
+      acc.push(getObject('removed', key, value));
+      return acc;
+    }
 
-const areDifferent = (object, key, value) => _.has(object, key) && !areEqual(value, object[key]);
+    const value2 = object2[key];
 
-const getObject = (sign, key, value) => ({ sign, key, value });
+    if (!isObject(value) || !isObject(value2)) {
+      if (areEqual(value, value2)) {
+        acc.push(getObject('same', key, value));
+      } else {
+        acc.push(getObject('old', key, value));
+        acc.push(getObject('updated', key, value2));
+      }
 
-const getKeysWithSameValues = (object1, object2) => Object.entries(object1)
-  .filter(([key, value]) => areSame(object2, key, value))
-  .map(([key, value]) => getObject(' ', key, value));
+      return acc;
+    }
 
-const getKeysWithDifferentValues = (object1, object2) => Object.entries(object1)
-  .filter(([key, value]) => areDifferent(object2, key, value))
-  .map(([key, value]) => [
-    getObject('-', key, value),
-    getObject('+', key, object2[key]),
-  ]);
+    const childrenDiff = getObject('same', key, getDifferences(value, value2));
+    return [...acc, childrenDiff];
+  }, []);
 
-const getRestOfObject = (object1, object2, sign) => Object.entries(object1)
-  .filter(([key]) => !_.has(object2, key))
-  .map(([key, value]) => getObject(sign, key, value));
+  const newProps = Object.entries(object2)
+    .filter(([key]) => !_.has(object1, key))
+    .map(([key, value]) => getObject('new', key, value));
 
-const getDifferences = (object1, object2) => [
-  ...getKeysWithSameValues(object1, object2),
-  ...getKeysWithDifferentValues(object1, object2),
-  ...getRestOfObject(object1, object2, '-'),
-  ...getRestOfObject(object2, object1, '+'),
-].flat();
+  const result = [...diff, ...newProps];
+  const sortedResult = _.sortBy(result, (prop) => prop.key);
+  return sortedResult;
+};
 
-export default (filepath1, filepath2) => {
+export default (filepath1, filepath2, formater = 'stylish') => {
   const object1 = getDataOfFile(filepath1);
   const object2 = getDataOfFile(filepath2);
 
-  if (!object1 || !object2) {
-    return null;
-  }
-
   const differences = getDifferences(object1, object2);
-  const sortedDifferences = _.sortBy(differences, (prop) => prop.key);
-  const differencesAsStrings = sortedDifferences.map(({ sign, key, value }) => ` ${sign} ${key}: ${value}`);
 
-  return ['{', ...differencesAsStrings, '}'].join('\n');
+  switch (formater) {
+    case 'stylish': return toStylish(differences);
+    default: return differences;
+  }
 };
