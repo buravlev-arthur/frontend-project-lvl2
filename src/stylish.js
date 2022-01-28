@@ -5,12 +5,11 @@ const signs = {
   new: '+',
   removed: '-',
   old: '-',
-  updated: '+',
 };
 
 const indent = (count) => ' '.repeat(count);
 
-const getChild = (data) => {
+const getChildProps = (data) => {
   if (isObject(data)) {
     const status = 'same';
     return Object.entries(data).map(([key, value]) => ({ status, key, value }));
@@ -26,19 +25,30 @@ const getPrefix = (data, key, status) => {
 };
 
 export default (diffs) => {
-  const getPropsAsString = (object, i) => object.reduce((str, { status, key, value }) => {
-    if (isPrimalType(value)) {
-      const propStr = `${indent(i)}${signs[status]} ${key}: ${value}\n`;
-      return str.concat(propStr);
+  if (diffs.length === 0) {
+    return '{}';
+  }
+
+  const getPropsAsStrings = (array, i) => array.map(({ status, key, value }) => {
+    if (status === 'changed') {
+      const { oldValue, newValue } = value;
+      const changedValues = [
+        { status: 'old', key, value: oldValue },
+        { status: 'new', key, value: newValue },
+      ];
+      return getPropsAsStrings(changedValues, i).join('\n');
     }
 
-    const child = getChild(value);
+    if (isPrimalType(value)) {
+      return `${indent(i)}${signs[status]} ${key}: ${value}`;
+    }
+
+    const childProps = getChildProps(value);
     const prefix = getPrefix(value, key, status);
-    const propsStrs = getPropsAsString(child, i + 4);
+    const children = getPropsAsStrings(childProps, i + 4).join('\n');
 
-    const children = `${indent(i)}${prefix}: {\n${propsStrs}${indent(i + 2)}}\n`;
-    return str.concat(children);
-  }, '');
+    return `${indent(i)}${prefix}: {\n${children}\n${indent(i + 2)}}`;
+  });
 
-  return `{\n${getPropsAsString(diffs, 2)}}`;
+  return `{\n${getPropsAsStrings(diffs, 2).join('\n')}\n}`;
 };

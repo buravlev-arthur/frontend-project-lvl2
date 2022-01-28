@@ -37,13 +37,13 @@ beforeAll(() => {
 test('Testing of JSON-files', () => {
   expect(genDiff(jsonFile1, jsonFile2)).toBe(expectedFile1);
   expect(genDiff(jsonFile1, jsonFile1)).toBe(expectedFile2);
-  expect(genDiff(emptyJsonFile, emptyJsonFile)).toBe('{\n}');
+  expect(genDiff(emptyJsonFile, emptyJsonFile)).toBe('{}');
   expect(genDiff(jsonFile2, emptyJsonFile)).toBe(expectedFile3);
 });
 
 test('Testing of YAML-files', () => {
   expect(genDiff(yamlFile1, yamlFile2)).toBe(expectedFile1);
   expect(genDiff(yamlFile1, yamlFile1)).toBe(expectedFile2);
-  expect(genDiff(emptyYamlFile, emptyYamlFile)).toBe('{\n}');
+  expect(genDiff(emptyYamlFile, emptyYamlFile)).toBe('{}');
   expect(genDiff(yamlFile2, emptyYamlFile)).toBe(expectedFile3);
 });

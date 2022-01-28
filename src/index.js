@@ -15,7 +15,7 @@ const getObject = (status, key, value) => ({ status, key, value });
 const getDifferences = (object1, object2) => {
   const keys = _.union(Object.keys(object1), Object.keys(object2));
 
-  const result = keys.flatMap((key) => {
+  const result = keys.map((key) => {
     if (!_.has(object2, key)) {
       return getObject('removed', key, object1[key]);
     }
@@ -29,10 +29,7 @@ const getDifferences = (object1, object2) => {
     }
 
     if (!isObject(object1[key]) || !isObject(object2[key])) {
-      return [
-        getObject('old', key, object1[key]),
-        getObject('updated', key, object2[key]),
-      ];
+      return getObject('changed', key, { oldValue: object1[key], newValue: object2[key] });
     }
 
     return getObject('same', key, getDifferences(object1[key], object2[key]));
