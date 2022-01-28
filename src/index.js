@@ -13,36 +13,32 @@ const getDataOfFile = (filepath) => {
 const getObject = (status, key, value) => ({ status, key, value });
 
 const getDifferences = (object1, object2) => {
-  const diff = Object.entries(object1).reduce((acc, [key, value]) => {
+  const keys = _.union(Object.keys(object1), Object.keys(object2));
+
+  const result = keys.flatMap((key) => {
     if (!_.has(object2, key)) {
-      acc.push(getObject('removed', key, value));
-      return acc;
+      return getObject('removed', key, object1[key]);
     }
 
-    const value2 = object2[key];
-
-    if (!isObject(value) || !isObject(value2)) {
-      if (areEqual(value, value2)) {
-        acc.push(getObject('same', key, value));
-      } else {
-        acc.push(getObject('old', key, value));
-        acc.push(getObject('updated', key, value2));
-      }
-
-      return acc;
+    if (!_.has(object1, key)) {
+      return getObject('new', key, object2[key]);
     }
 
-    const childrenDiff = getObject('same', key, getDifferences(value, value2));
-    return [...acc, childrenDiff];
-  }, []);
+    if (areEqual(object1[key], object2[key])) {
+      return getObject('same', key, object1[key]);
+    }
 
-  const newProps = Object.entries(object2)
-    .filter(([key]) => !_.has(object1, key))
-    .map(([key, value]) => getObject('new', key, value));
+    if (!isObject(object1[key]) || !isObject(object2[key])) {
+      return [
+        getObject('old', key, object1[key]),
+        getObject('updated', key, object2[key]),
+      ];
+    }
 
-  const result = [...diff, ...newProps];
-  const sortedResult = _.sortBy(result, (prop) => prop.key);
-  return sortedResult;
+    return getObject('same', key, getDifferences(object1[key], object2[key]));
+  });
+
+  return _.sortBy(result, (prop) => prop.key);
 };
 
 export default (filepath1, filepath2, formater = 'stylish') => {
