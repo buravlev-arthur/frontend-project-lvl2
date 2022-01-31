@@ -10,65 +10,47 @@ const __dirname = dirname(__filename);
 const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
 const readFile = (filename) => fs.readFileSync(getFixturePath(filename), 'utf-8');
 
-let jsonFile1;
-let jsonFile2;
-let emptyJsonFile;
-
-let yamlFile1;
-let yamlFile2;
-let emptyYamlFile;
-
-let stylishOutput1;
-let stylishOutput2;
-let stylishOutput3;
-
-let planeOutput;
-
-let jsonOutput;
+const files = {};
 
 beforeAll(() => {
-  jsonFile1 = getFixturePath('file1.json');
-  jsonFile2 = getFixturePath('file2.json');
-  emptyJsonFile = getFixturePath('file3.json');
-
-  yamlFile1 = getFixturePath('file1.yaml');
-  yamlFile2 = getFixturePath('file2.yml');
-  emptyYamlFile = getFixturePath('file3.yml');
-
-  stylishOutput1 = readFile('stylish_result1.txt');
-  stylishOutput2 = readFile('stylish_result2.txt');
-  stylishOutput3 = readFile('stylish_result3.txt');
-
-  planeOutput = readFile('plane_result.txt');
-
-  jsonOutput = readFile('json_result.txt');
+  files.jsonFile1 = getFixturePath('file1.json');
+  files.jsonFile2 = getFixturePath('file2.json');
+  files.emptyJsonFile = getFixturePath('file3.json');
+  files.yamlFile1 = getFixturePath('file1.yaml');
+  files.yamlFile2 = getFixturePath('file2.yml');
+  files.emptyYamlFile = getFixturePath('file3.yml');
+  files.stylishOutput1 = readFile('stylish_result1.txt');
+  files.stylishOutput2 = readFile('stylish_result2.txt');
+  files.stylishOutput3 = readFile('stylish_result3.txt');
+  files.planeOutput = readFile('plane_result.txt');
+  files.jsonOutput = readFile('json_result.txt');
 });
 
 test('Testing of JSON-files', () => {
-  expect(genDiff(jsonFile1, jsonFile2)).toBe(stylishOutput1);
-  expect(genDiff(jsonFile1, jsonFile1)).toBe(stylishOutput2);
-  expect(genDiff(emptyJsonFile, emptyJsonFile)).toBe('{}');
-  expect(genDiff(jsonFile2, emptyJsonFile)).toBe(stylishOutput3);
+  expect(genDiff(files.jsonFile1, files.jsonFile2)).toBe(files.stylishOutput1);
+  expect(genDiff(files.jsonFile1, files.jsonFile1)).toBe(files.stylishOutput2);
+  expect(genDiff(files.emptyJsonFile, files.emptyJsonFile)).toBe('{}');
+  expect(genDiff(files.jsonFile2, files.emptyJsonFile)).toBe(files.stylishOutput3);
 });
 
 test('Testing of YAML-files', () => {
-  expect(genDiff(yamlFile1, yamlFile2)).toBe(stylishOutput1);
-  expect(genDiff(yamlFile1, yamlFile1)).toBe(stylishOutput2);
-  expect(genDiff(emptyYamlFile, emptyYamlFile)).toBe('{}');
-  expect(genDiff(yamlFile2, emptyYamlFile)).toBe(stylishOutput3);
+  expect(genDiff(files.yamlFile1, files.yamlFile2)).toBe(files.stylishOutput1);
+  expect(genDiff(files.yamlFile1, files.yamlFile1)).toBe(files.stylishOutput2);
+  expect(genDiff(files.emptyYamlFile, files.emptyYamlFile)).toBe('{}');
+  expect(genDiff(files.yamlFile2, files.emptyYamlFile)).toBe(files.stylishOutput3);
 });
 
 test('Testing of stylish-formated output', () => {
-  expect(genDiff(jsonFile1, jsonFile2, 'stylish')).toBe(stylishOutput1);
-  expect(genDiff(yamlFile1, yamlFile2, 'stylish')).toBe(stylishOutput1);
+  expect(genDiff(files.jsonFile1, files.jsonFile2, 'stylish')).toBe(files.stylishOutput1);
+  expect(genDiff(files.yamlFile1, files.yamlFile2, 'stylish')).toBe(files.stylishOutput1);
 });
 
 test('Testing of plane-formated output', () => {
-  expect(genDiff(jsonFile1, jsonFile2, 'plain')).toBe(planeOutput);
-  expect(genDiff(yamlFile1, yamlFile2, 'plain')).toBe(planeOutput);
+  expect(genDiff(files.jsonFile1, files.jsonFile2, 'plain')).toBe(files.planeOutput);
+  expect(genDiff(files.yamlFile1, files.yamlFile2, 'plain')).toBe(files.planeOutput);
 });
 
 test('Testing of json-formated output', () => {
-  expect(genDiff(jsonFile1, jsonFile2, 'json')).toBe(jsonOutput);
-  expect(genDiff(yamlFile1, yamlFile2, 'json')).toBe(jsonOutput);
+  expect(genDiff(files.jsonFile1, files.jsonFile2, 'json')).toBe(files.jsonOutput);
+  expect(genDiff(files.yamlFile1, files.yamlFile2, 'json')).toBe(files.jsonOutput);
 });
