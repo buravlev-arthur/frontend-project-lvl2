@@ -19,6 +19,7 @@ let emptyYamlFile;
 let expectedFile1;
 let expectedFile2;
 let expectedFile3;
+let planeOutput;
 
 beforeAll(() => {
   jsonFile1 = getFixturePath('file1.json');
@@ -29,9 +30,11 @@ beforeAll(() => {
   yamlFile2 = getFixturePath('file2.yml');
   emptyYamlFile = getFixturePath('file3.yml');
 
-  expectedFile1 = readFile('result1.txt');
-  expectedFile2 = readFile('result2.txt');
-  expectedFile3 = readFile('result3.txt');
+  expectedFile1 = readFile('stylish_result1.txt');
+  expectedFile2 = readFile('stylish_result2.txt');
+  expectedFile3 = readFile('stylish_result3.txt');
+
+  planeOutput = readFile('plane_result.txt');
 });
 
 test('Testing of JSON-files', () => {
@@ -46,4 +49,14 @@ test('Testing of YAML-files', () => {
   expect(genDiff(yamlFile1, yamlFile1)).toBe(expectedFile2);
   expect(genDiff(emptyYamlFile, emptyYamlFile)).toBe('{}');
   expect(genDiff(yamlFile2, emptyYamlFile)).toBe(expectedFile3);
+});
+
+test('Testing of stylish-formated output', () => {
+  expect(genDiff(jsonFile1, jsonFile2, 'stylish')).toBe(expectedFile1);
+  expect(genDiff(yamlFile1, yamlFile2, 'stylish')).toBe(expectedFile1);
+});
+
+test('Testing of plane-formated output', () => {
+  expect(genDiff(jsonFile1, jsonFile2, 'plain')).toBe(planeOutput);
+  expect(genDiff(yamlFile1, yamlFile2, 'plain')).toBe(planeOutput);
 });

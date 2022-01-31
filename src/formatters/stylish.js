@@ -1,4 +1,4 @@
-import { isObject, isPrimalType } from './utils.js';
+import { isObject, isPrimalType } from '../utils.js';
 
 const signs = {
   same: ' ',

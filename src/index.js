@@ -3,7 +3,7 @@ import _ from 'lodash';
 import path from 'path';
 import { areEqual, isObject } from './utils.js';
 import parse from './parsers.js';
-import toStylish from './stylish.js';
+import getFormatedOutput from './formatters/index.js';
 
 const getDataOfFile = (filepath) => {
   const normalizedPath = path.resolve(filepath);
@@ -32,7 +32,7 @@ const getDifferences = (object1, object2) => {
       return getObject('changed', key, { oldValue: object1[key], newValue: object2[key] });
     }
 
-    return getObject('same', key, getDifferences(object1[key], object2[key]));
+    return getObject('haveChildren', key, getDifferences(object1[key], object2[key]));
   });
 
   return _.sortBy(result, (prop) => prop.key);
@@ -42,10 +42,6 @@ export default (filepath1, filepath2, formater = 'stylish') => {
   const object1 = getDataOfFile(filepath1);
   const object2 = getDataOfFile(filepath2);
 
-  const differences = getDifferences(object1, object2);
-
-  switch (formater) {
-    case 'stylish': return toStylish(differences);
-    default: return differences;
-  }
+  const diff = getDifferences(object1, object2);
+  return getFormatedOutput(diff, formater);
 };
