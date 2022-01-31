@@ -12,5 +12,7 @@
 #### Глубокое сравнение файлов
 [![asciicast](https://asciinema.org/a/Uyu0AhyTESYr0w3uz2lB9VFQb.svg)](https://asciinema.org/a/Uyu0AhyTESYr0w3uz2lB9VFQb)
 
-#### Вывов сраванения в формете "plain"
+#### Вывод сраванения в формете "plain"
 [![asciicast](https://asciinema.org/a/1DvLtQurwtJusIIVdUBqWk6Mr.svg)](https://asciinema.org/a/1DvLtQurwtJusIIVdUBqWk6Mr)
+#### Вывод стравнения в формате "JSON"
+[![asciicast](https://asciinema.org/a/grrkfdIMNIoOsKKcYWxKuzGx1.svg)](https://asciinema.org/a/grrkfdIMNIoOsKKcYWxKuzGx1)
