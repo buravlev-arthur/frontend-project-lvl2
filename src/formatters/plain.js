@@ -1,12 +1,12 @@
 import _ from 'lodash';
-import { isObject, isPrimalType } from '../utils.js';
+import isPrimalType from '../utils.js';
 
 const getFormatedValue = (value) => {
   if (isPrimalType(value)) {
     return typeof value === 'string' ? `'${value}'` : value;
   }
 
-  if (isObject(value) && _.has(value, ['oldValue'])) {
+  if (_.isPlainObject(value) && _.has(value, ['oldValue'])) {
     return {
       oldValue: getFormatedValue(value.oldValue),
       newValue: getFormatedValue(value.newValue),

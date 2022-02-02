@@ -1,17 +1,12 @@
 import yaml from 'js-yaml';
 
-const isJSON = (path) => path.includes('.json');
+export default (data, path) => {
+  const format = path.slice(-4, -3) === '.' ? path.slice(-3) : path.slice(-4);
 
-const isYAML = (path) => path.includes('.yaml') || path.includes('.yml');
-
-export default (file, path) => {
-  if (isJSON(path)) {
-    return JSON.parse(file);
+  switch (format) {
+    case 'json': return JSON.parse(data);
+    case 'yaml': return yaml.load(data) ?? {};
+    case 'yml': return yaml.load(data) ?? {};
+    default: return null;
   }
-
-  if (isYAML(path)) {
-    return yaml.load(file) ?? {};
-  }
-
-  return null;
 };

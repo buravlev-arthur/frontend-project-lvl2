@@ -1,4 +1,5 @@
-import { isObject, isPrimalType } from '../utils.js';
+import _ from 'lodash';
+import isPrimalType from '../utils.js';
 
 const signs = {
   same: ' ',
@@ -10,7 +11,7 @@ const signs = {
 const indent = (count) => ' '.repeat(count);
 
 const getChildProps = (data) => {
-  if (isObject(data)) {
+  if (_.isPlainObject(data)) {
     const status = 'same';
     return Object.entries(data).map(([key, value]) => ({ status, key, value }));
   }
@@ -18,7 +19,7 @@ const getChildProps = (data) => {
 };
 
 const getPrefix = (data, key, status) => {
-  if (isObject(data)) {
+  if (_.isPlainObject(data)) {
     return `${signs[status]} ${key}`;
   }
   return `${indent(2)}${key}`;
