@@ -6,7 +6,8 @@ import getFormatedOutput from './formatters/index.js';
 
 const getDataOfFile = (filepath) => {
   const normalizedPath = path.resolve(filepath);
-  return parse(fs.readFileSync(normalizedPath, 'utf-8'), normalizedPath);
+  const format = normalizedPath.slice(-4, -3) === '.' ? normalizedPath.slice(-3) : normalizedPath.slice(-4);
+  return parse(fs.readFileSync(normalizedPath, 'utf-8'), format);
 };
 
 export default (filepath1, filepath2, formater = 'stylish') => {
