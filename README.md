@@ -52,8 +52,9 @@ const diff = genDiff(filepath1, filepath2, format);
 ```
    Параметры функции:
    - **filepath1**, **filepath2** - абсолютные или относительные пути к сравневаемым файлам;
-   - \[**format**\] - формат возвращаемого результата сравнения. Может принимать значения: "stylish", "plain", "json". Не обязательный параметр. По умолчанию - "stylish".
+   - \[**format**\] - формат возвращаемого результата сравнения. Может принимать значения: "stylish", "plain", "json". Необязательный параметр, по умолчанию - "stylish".
 
+### Демострация работы утилиты
 #### Сравнение плоских JSON-файлов
 [![asciicast](https://asciinema.org/a/mSrXOHggIjdGAQGX9rW4U3Lf4.svg)](https://asciinema.org/a/mSrXOHggIjdGAQGX9rW4U3Lf4)
 
