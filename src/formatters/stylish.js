@@ -41,15 +41,15 @@ export default (diffs) => {
     }
 
     if (isPrimalType(value)) {
-      return `${indent(i)}${signs[status]} ${key}: ${value}`;
+      return `${indent(i * 4 + 2)}${signs[status]} ${key}: ${value}`;
     }
 
     const childProps = getChildProps(value);
     const prefix = getPrefix(value, key, status);
-    const children = getPropsAsStrings(childProps, i + 4).join('\n');
+    const children = getPropsAsStrings(childProps, i + 1).join('\n');
 
-    return `${indent(i)}${prefix}: {\n${children}\n${indent(i + 2)}}`;
+    return `${indent(i * 4 + 2)}${prefix}: {\n${children}\n${indent(i * 4 + 4)}}`;
   });
 
-  return `{\n${getPropsAsStrings(diffs, 2).join('\n')}\n}`;
+  return `{\n${getPropsAsStrings(diffs, 0).join('\n')}\n}`;
 };
