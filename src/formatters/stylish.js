@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import isPrimalType from '../utils.js';
 
 const signs = {
