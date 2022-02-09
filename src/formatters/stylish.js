@@ -6,50 +6,55 @@ const signs = {
   new: '+',
   removed: '-',
   old: '-',
+  haveChildren: ' ',
 };
 
 const indent = (count) => ' '.repeat(count);
 
-const getChildProps = (data) => {
-  if (_.isPlainObject(data)) {
-    const status = 'same';
-    return Object.entries(data).map(([key, value]) => ({ status, key, value }));
-  }
-  return data;
+const formatObjectValue = (prop, startAcc) => {
+  const getProps = (object, acc) => Object.entries(object).map(([key, value]) => {
+    const i = acc * 4 + 8;
+
+    if (isPrimalType(value)) {
+      return `${indent(i)}${key}: ${value}`;
+    }
+
+    return `${indent(i)}${key}: {\n${getProps(value, acc + 1)}\n${indent(i)}}`;
+  }).join('\n');
+
+  return `{\n${getProps(prop, startAcc)}\n${indent(startAcc * 4 + 4)}}`;
 };
 
-const getPrefix = (data, key, status) => {
-  if (_.isPlainObject(data)) {
-    return `${signs[status]} ${key}`;
+const formatSingleValue = ({ status, key, value }, acc) => {
+  const i = acc * 4 + 2;
+
+  if (isPrimalType(value)) {
+    return `${indent(i)}${signs[status]} ${key}: ${value}`;
   }
-  return `${indent(2)}${key}`;
+
+  return `${indent(i)}${signs[status]} ${key}: ${formatObjectValue(value, acc)}`;
 };
+
+const formatChangedValues = ({ key, oldValue, newValue }, acc) => [
+  formatSingleValue({ status: 'old', key, value: oldValue }, acc),
+  formatSingleValue({ status: 'new', key, value: newValue }, acc),
+];
 
 export default (diffs) => {
   if (diffs.length === 0) {
     return '{}';
   }
 
-  const getPropsAsStrings = (array, i) => array.map(({ status, key, value }) => {
-    if (status === 'changed') {
-      const { oldValue, newValue } = value;
-      const changedValues = [
-        { status: 'old', key, value: oldValue },
-        { status: 'new', key, value: newValue },
-      ];
-      return getPropsAsStrings(changedValues, i).join('\n');
+  const getPropsAsStrings = (array, acc) => array.flatMap((prop) => {
+    switch (prop.status) {
+      case 'changed': return formatChangedValues(prop, acc);
+      case 'haveChildren': {
+        const children = getPropsAsStrings(prop.children, acc + 1);
+        return `${indent(acc * 4 + 2)}${signs[prop.status]} ${prop.key}: {\n${children}\n${indent(acc * 4 + 4)}}`;
+      }
+      default: return formatSingleValue(prop, acc);
     }
+  }).join('\n');
 
-    if (isPrimalType(value)) {
-      return `${indent(i * 4 + 2)}${signs[status]} ${key}: ${value}`;
-    }
-
-    const childProps = getChildProps(value);
-    const prefix = getPrefix(value, key, status);
-    const children = getPropsAsStrings(childProps, i + 1).join('\n');
-
-    return `${indent(i * 4 + 2)}${prefix}: {\n${children}\n${indent(i * 4 + 4)}}`;
-  });
-
-  return `{\n${getPropsAsStrings(diffs, 0).join('\n')}\n}`;
+  return `{\n${getPropsAsStrings(diffs, 0)}\n}`;
 };

@@ -17,11 +17,15 @@ const getDiff = (object1, object2) => {
     }
 
     if (!_.isPlainObject(object1[key]) || !_.isPlainObject(object2[key])) {
-      const values = { oldValue: object1[key], newValue: object2[key] };
-      return { status: 'changed', key, value: values };
+      return {
+        status: 'changed',
+        key,
+        oldValue: object1[key],
+        newValue: object2[key],
+      };
     }
 
-    return { status: 'haveChildren', key, value: getDiff(object1[key], object2[key]) };
+    return { status: 'haveChildren', key, children: getDiff(object1[key], object2[key]) };
   });
 
   return result;

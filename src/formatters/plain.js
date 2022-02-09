@@ -1,4 +1,4 @@
-import _ from 'lodash';
+// import _ from 'lodash';
 import isPrimalType from '../utils.js';
 
 const getFormatedValue = (value) => {
@@ -6,26 +6,18 @@ const getFormatedValue = (value) => {
     return typeof value === 'string' ? `'${value}'` : value;
   }
 
-  if (_.isPlainObject(value) && _.has(value, ['oldValue'])) {
-    return {
-      oldValue: getFormatedValue(value.oldValue),
-      newValue: getFormatedValue(value.newValue),
-    };
-  }
-
   return '[complex value]';
 };
 
 export default (diff) => {
-  const getPropsAsStrings = (array, path) => array.flatMap(({ status, key, value }) => {
-    const name = path.length > 0 ? `${path}.${key}` : key;
-    const formatedValue = getFormatedValue(value);
+  const getPropsAsStrings = (array, path) => array.flatMap((prop) => {
+    const name = path.length > 0 ? `${path}.${prop.key}` : prop.key;
 
-    switch (status) {
-      case 'new': return `Property '${name}' was added with value: ${formatedValue}`;
+    switch (prop.status) {
+      case 'new': return `Property '${name}' was added with value: ${getFormatedValue(prop.value)}`;
       case 'removed': return `Property '${name}' was removed`;
-      case 'changed': return `Property '${name}' was updated. From ${formatedValue.oldValue} to ${formatedValue.newValue}`;
-      case 'haveChildren': return getPropsAsStrings(value, name);
+      case 'changed': return `Property '${name}' was updated. From ${getFormatedValue(prop.oldValue)} to ${getFormatedValue(prop.newValue)}`;
+      case 'haveChildren': return getPropsAsStrings(prop.children, name);
       default: return [];
     }
   });
