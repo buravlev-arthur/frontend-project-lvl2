@@ -18,7 +18,8 @@ export default (diff) => {
       case 'removed': return `Property '${name}' was removed`;
       case 'changed': return `Property '${name}' was updated. From ${getFormatedValue(prop.oldValue)} to ${getFormatedValue(prop.newValue)}`;
       case 'haveChildren': return getPropsAsStrings(prop.children, name);
-      default: return [];
+      case 'same': return [];
+      default: throw new Error(`Plain formatter has gotten wrong status: "${prop.status}"`);
     }
   });
 

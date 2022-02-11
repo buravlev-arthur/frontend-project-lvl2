@@ -8,36 +8,26 @@ const signs = {
   haveChildren: ' ',
 };
 
-const indent = (count) => ' '.repeat(count);
-
-const formatObjectValue = (prop, startAcc) => {
-  const getProps = (object, acc) => Object.entries(object).map(([key, value]) => {
-    const i = acc * 4 + 8;
-
-    if (isPrimalType(value)) {
-      return `${indent(i)}${key}: ${value}`;
-    }
-
-    return `${indent(i)}${key}: {\n${getProps(value, acc + 1)}\n${indent(i)}}`;
-  }).join('\n');
-
-  return `{\n${getProps(prop, startAcc)}\n${indent(startAcc * 4 + 4)}}`;
-};
-
-const formatSingleValue = ({ status, key, value }, acc) => {
-  const i = acc * 4 + 2;
-
-  if (isPrimalType(value)) {
-    return `${indent(i)}${signs[status]} ${key}: ${value}`;
+const stringify = (data, depth = 0) => {
+  if (isPrimalType(data)) {
+    return String(data);
   }
 
-  return `${indent(i)}${signs[status]} ${key}: ${formatObjectValue(value, acc)}`;
-};
+  const repeater = ' ';
 
-const formatChangedValues = ({ key, oldValue, newValue }, acc) => [
-  formatSingleValue({ status: 'old', key, value: oldValue }, acc),
-  formatSingleValue({ status: 'new', key, value: newValue }, acc),
-];
+  const getProps = (props, i) => Object.entries(props).map(([key, value]) => {
+    const indent = repeater.repeat(i * 4 + depth * 4);
+
+    if (isPrimalType(value) || value === null) {
+      return `${indent}${key}: ${value}`;
+    }
+
+    return `${indent}${key}: {\n${getProps(value, i + 1)}\n${indent}}`;
+  }).join('\n');
+
+  const braceIndent = repeater.repeat(depth * 4 + 4);
+  return `{\n${getProps(data, 2)}\n${braceIndent}}`;
+};
 
 export default (diffs) => {
   if (diffs.length === 0) {
@@ -45,13 +35,24 @@ export default (diffs) => {
   }
 
   const getPropsAsStrings = (array, acc) => array.flatMap((prop) => {
+    const count = acc * 4 + 2;
+    const keyIndent = ' '.repeat(count);
+    const braceIndent = ' '.repeat(count + 2);
+    const defaultPrefix = `${keyIndent}${signs[prop.status]} ${prop.key}`;
+
     switch (prop.status) {
-      case 'changed': return formatChangedValues(prop, acc);
+      case 'new': return `${defaultPrefix}: ${stringify(prop.value, acc)}`;
+      case 'removed': return `${defaultPrefix}: ${stringify(prop.value, acc)}`;
+      case 'same': return `${defaultPrefix}: ${stringify(prop.value, acc)}`;
+      case 'changed': return [
+        `${keyIndent}${signs.old} ${prop.key}: ${stringify(prop.oldValue, acc)}`,
+        `${keyIndent}${signs.new} ${prop.key}: ${stringify(prop.newValue, acc)}`,
+      ];
       case 'haveChildren': {
         const children = getPropsAsStrings(prop.children, acc + 1);
-        return `${indent(acc * 4 + 2)}${signs[prop.status]} ${prop.key}: {\n${children}\n${indent(acc * 4 + 4)}}`;
+        return `${defaultPrefix}: {\n${children}\n${braceIndent}}`;
       }
-      default: return formatSingleValue(prop, acc);
+      default: throw new Error(`Stylish formatter has gotten wrong status: "${prop.status}"`);
     }
   }).join('\n');
 
