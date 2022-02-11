@@ -34,21 +34,21 @@ export default (diffs) => {
     return '{}';
   }
 
-  const getPropsAsStrings = (array, acc) => array.flatMap((prop) => {
-    const keyIndent = ' '.repeat(acc * 4 + 2);
-    const braceIndent = ' '.repeat(acc * 4 + 4);
+  const getPropsAsStrings = (array, depth) => array.flatMap((prop) => {
+    const keyIndent = ' '.repeat(depth * 4 + 2);
+    const braceIndent = ' '.repeat(depth * 4 + 4);
     const defaultPrefix = `${keyIndent}${signs[prop.status]} ${prop.key}`;
 
     switch (prop.status) {
-      case 'new': return `${defaultPrefix}: ${stringify(prop.value, acc)}`;
-      case 'removed': return `${defaultPrefix}: ${stringify(prop.value, acc)}`;
-      case 'same': return `${defaultPrefix}: ${stringify(prop.value, acc)}`;
+      case 'new': return `${defaultPrefix}: ${stringify(prop.value, depth)}`;
+      case 'removed': return `${defaultPrefix}: ${stringify(prop.value, depth)}`;
+      case 'same': return `${defaultPrefix}: ${stringify(prop.value, depth)}`;
       case 'changed': return [
-        `${keyIndent}${signs.old} ${prop.key}: ${stringify(prop.oldValue, acc)}`,
-        `${keyIndent}${signs.new} ${prop.key}: ${stringify(prop.newValue, acc)}`,
+        `${keyIndent}${signs.old} ${prop.key}: ${stringify(prop.oldValue, depth)}`,
+        `${keyIndent}${signs.new} ${prop.key}: ${stringify(prop.newValue, depth)}`,
       ];
       case 'haveChildren': {
-        const children = getPropsAsStrings(prop.children, acc + 1);
+        const children = getPropsAsStrings(prop.children, depth + 1);
         return `${defaultPrefix}: {\n${children}\n${braceIndent}}`;
       }
       default: throw new Error(`Stylish formatter has gotten wrong status: "${prop.status}"`);
