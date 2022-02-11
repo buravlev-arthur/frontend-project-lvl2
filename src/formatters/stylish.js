@@ -8,7 +8,10 @@ const signs = {
   haveChildren: ' ',
 };
 
-const getIndent = (n1, n2) => ' '.repeat(n1 * 4 + n2);
+const getIndent = (depth, extraIndent) => {
+  const step = 4;
+  return ' '.repeat(depth * step + extraIndent);
+};
 
 const stringify = (data, depth = 0) => {
   if (isPrimalType(data)) {
