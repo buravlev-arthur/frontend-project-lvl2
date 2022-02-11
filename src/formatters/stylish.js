@@ -35,9 +35,8 @@ export default (diffs) => {
   }
 
   const getPropsAsStrings = (array, acc) => array.flatMap((prop) => {
-    const count = acc * 4 + 2;
-    const keyIndent = ' '.repeat(count);
-    const braceIndent = ' '.repeat(count + 2);
+    const keyIndent = ' '.repeat(acc * 4 + 2);
+    const braceIndent = ' '.repeat(acc * 4 + 4);
     const defaultPrefix = `${keyIndent}${signs[prop.status]} ${prop.key}`;
 
     switch (prop.status) {
